@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 18:08:15 by esellier          #+#    #+#             */
-/*   Updated: 2024/12/03 16:58:24 by marvin           ###   ########.fr       */
+/*   Updated: 2024/12/04 09:49:15 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,8 @@ int	print_status(t_thread *philo, int i)
 	
 	if (philo->life)
 	{
-		time = calcul_time(philo->data->start_time);
 		pthread_mutex_lock(&philo->data->print_mutex);
+		time = calcul_time(philo->data->start_time);
 		if (i == EAT)
 		{
 			printf("%ldms philo %d \033[38;2;255;138mhas taken a fork\033[0m\n",
