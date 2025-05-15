@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: esellier <esellier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 14:08:57 by esellier          #+#    #+#             */
-/*   Updated: 2024/12/01 21:06:03 by marvin           ###   ########.fr       */
+/*   Updated: 2024/12/05 16:40:38 by esellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,20 +65,23 @@ int	ft_strlen(char *str)
 
 void	free_threads(t_thread *current, unsigned int philo)
 {
-	t_thread		*next;
 	unsigned int	count;
 	void			*rtrn;
 
 	count = 0;
+	if (current->data->philo == 1)
+	{
+		if (pthread_mutex_unlock(&current->fork))
+			write(2, "error: mutex not unlocked\n", 26);
+	}
 	while (current && count < philo)
 	{
-		next = current->next;
 		if (current->thread_id)
 		{
-			if (pthread_join(current->thread_id, &rtrn) != 0)
+			if (pthread_join(current->thread_id, &rtrn))
 				write(2, "error: thread join failed\n", 26);
 		}
-		current = next;
+		current = current->next;
 		count++;
 	}
 	return ;
@@ -89,7 +92,7 @@ void	free_philo(t_data *data)
 	t_thread		*next;
 	t_thread		*current;
 	unsigned int	count;
-	
+
 	count = 0;
 	current = data->threads;
 	while (current && count < data->philo)
@@ -99,5 +102,5 @@ void	free_philo(t_data *data)
 		current = next;
 		count++;
 	}
-	free(data);	
+	free(data);
 }

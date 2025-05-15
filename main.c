@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: esellier <esellier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 18:27:03 by esellier          #+#    #+#             */
-/*   Updated: 2024/12/03 16:40:04 by marvin           ###   ########.fr       */
+/*   Updated: 2024/12/06 19:52:49 by esellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,18 @@ void	check_args(char **array)
 	}
 }
 
+void	init_philo(t_thread *philo, int i, t_data *d)
+{
+	philo->position = i;
+	philo->nb_eat = d->nb_eat;
+	philo->life = 1;
+	philo->thread_id = 0;
+	philo->fork_status = 0;
+	philo->status = NEUTRAL;
+	philo->data = d;
+	philo->next = NULL;
+}
+
 t_thread	*init_thread_struc(t_data *d, t_thread *philo, unsigned int i)
 {
 	t_thread		*begin;
@@ -43,16 +55,9 @@ t_thread	*init_thread_struc(t_data *d, t_thread *philo, unsigned int i)
 	{
 		philo = malloc (sizeof (t_thread));
 		if (!philo)
-			error_msg("malloc error:  check computer's memory\n", d, philo, 1);
-		philo->position = i;
-		philo->nb_eat = d->nb_eat;
-		philo->life = 1;
-		philo->thread_id = 0;
-		philo->fork_status = 0;
-		philo->status = NEUTRAL;
-		philo->data = d;
+			error_msg("malloc error: check computer's memory\n", d, philo, 1);
+		init_philo(philo, i, d);
 		philo->previous = previous;
-		philo->next = NULL;
 		if (previous)
 			previous->next = philo;
 		else
@@ -75,7 +80,7 @@ t_data	*initialize_struc(t_data *data, char **array, int i)
 	while (array[i])
 	{
 		tmp = unsigned_atoi(array[i], data);
-		if (i == 1 && tmp < 1)
+		if (i == 1 && (tmp < 1 || tmp > 200))
 			error_msg("arg 1: put a number between 1 & 200\n", data, NULL, 0);
 		if (i == 1)
 			data->philo = tmp;
@@ -94,38 +99,6 @@ t_data	*initialize_struc(t_data *data, char **array, int i)
 	return (data);
 }
 
-void	print_struct(t_data *data)
-{
-	if (data->philo)
-		printf("philo=%d\n", data->philo);
-	if (data->to_die)
-		printf("to_die=%ld\n", data->to_die);
-	if (data->to_eat)
-		printf("to_eat=%ld\n", data->to_eat);
-	if (data->to_sleep)
-		printf("to_sleep=%ld\n", data->to_sleep);
-	if (data->nb_eat)
-		printf("nb_eat=%d\n", data->nb_eat);
-}
-
-void	print_threads(t_thread	*threads, t_data *data)
-{
-	t_thread		*current;
-	unsigned int	count;
-
-	count = 0;
-	current = threads;
-	while (current && count < data->philo)
-	{
-		if (current->position)
-			printf("position=%d\n", current->position);
-		if (current->status)
-			printf("status=%d\n", current->status);
-		current = current->next;
-		count++;
-	}
-}
-
 int	main(int argc, char **argv)
 {
 	t_data		*data;
@@ -138,6 +111,8 @@ int	main(int argc, char **argv)
 	if (argc == 5)
 		data->nb_eat = -2;
 	data->threads = init_thread_struc(data, data->threads, 1);
+	if (data->philo == 1)
+		do_philo(data->threads, data);
 	do_mutex(data);
 	do_threads(data);
 	free_threads(data->threads, data->philo);

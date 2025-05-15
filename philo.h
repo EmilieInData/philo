@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: esellier <esellier@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 18:27:29 by esellier          #+#    #+#             */
-/*   Updated: 2024/12/03 16:39:35 by marvin           ###   ########.fr       */
+/*   Updated: 2024/12/07 17:04:59 by esellier         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 # include <unistd.h>
 # include <pthread.h>
 
+# define FORK 0
 # define EAT 1
 # define SLEEP 2
 # define THINK 3
@@ -50,6 +51,7 @@ typedef struct s_data
 	unsigned int		philo;
 	struct timeval		start_time;
 	pthread_t			thread_die;
+	pthread_mutex_t		status_mutex;
 	pthread_mutex_t		general_mutex;
 	pthread_mutex_t		print_mutex;
 	unsigned long		to_die;
@@ -61,11 +63,10 @@ typedef struct s_data
 
 //main
 void			check_args(char **array);
+void			init_philo(t_thread *philo, int i, t_data *d);
 t_thread		*init_thread_struc(t_data *data, t_thread *philo,
 					unsigned int i);
 t_data			*initialize_struc(t_data *data, char **array, int i);
-void			print_struct(t_data *data); // to_borrow
-void			print_threads(t_thread *threads, t_data *data); // to borrow
 int				main(int argc, char **argv);
 
 //philo_utils
@@ -78,16 +79,22 @@ void			free_philo(t_data *data);
 
 //create_routine
 int				do_eat(t_thread *philo);
+int				do_eat_end(t_thread *philo);
 int				do_sleep(t_thread *philo);
 int				do_think(t_thread *philo);
 void			*do_routine(void *arg);
-void			do_threads(t_data *data);
 
 //routine_utils
 unsigned long	calcul_time(struct timeval start);
-void			do_mutex(t_data *data);
 void			*check_die(void *arg);
-int				print_status(t_thread *philo, int i);
+void			*do_die(t_data *d, t_thread *philo);
+void			print_eat(unsigned long time, t_thread *philo);
+int				print_status(t_thread *philo, int i, unsigned long time);
+
+//mutex
+ssize_t			do_threads(t_data *data);
+void			do_mutex(t_data *data);
 void			*destroy_mutex(t_thread *current, unsigned int philo);
+void			do_philo(t_thread *philo, t_data *data);
 
 #endif

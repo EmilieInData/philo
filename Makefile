@@ -4,12 +4,12 @@ NAME = philo
 
 HEADER_NAME = philo.h
 
-FLAGS = -Wall -Wextra -Werror -g -pthread #-fsanitize=address -fsanitize=leak
-
+FLAGS = -Wall -Wextra -Werror -g
 SRC = 	main.c \
 		philo_utils.c \
 		create_routine.c \
-		routine_utils.c
+		routine_utils.c \
+		mutex.c
 		
 OBJS = $(SRC:.c=.o)
 
@@ -30,4 +30,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean r
+.PHONY: all clean fclean re
